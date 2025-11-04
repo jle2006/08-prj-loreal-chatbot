@@ -49,6 +49,14 @@ body {
   margin-bottom: 10px;
 }
 
+/* Brand logo above the title */
+.brand-logo {
+  display: block;
+  margin: 0 auto 12px;
+  max-width: 200px;
+  height: auto;
+}
+
 /* -------- chat area -------- */
 .chatbox {
   margin: 40px 0;

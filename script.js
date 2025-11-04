@@ -35,6 +35,39 @@ chatForm.addEventListener("submit", async (e) => {
   // Show user's message
   appendMessage("user", text);
   userInput.value = "";
+  // Detect off-topic questions about L'Oréal and short-circuit with a friendly reminder
+  const brandMention = /l['’]?or[eé]al|loreal/i.test(text);
+  const offTopicKeywords = [
+    "ceo",
+    "salary",
+    "stock",
+    "share price",
+    "lawsuit",
+    "scandal",
+    "address",
+    "phone",
+    "email",
+    "headquarters",
+    "founder",
+    "careers",Ca
+    "jobs",
+    "politics",
+    "religion",
+    "vote",
+    "tax",
+    "crime",
+  ];
+
+  const lower = text.toLowerCase();
+  const looksOffTopic = offTopicKeywords.some((k) => lower.includes(k));
+
+  if (brandMention && looksOffTopic) {
+    appendMessage(
+      "assistant",
+      "Please stay on topic — I can help with product recommendations, routines, ingredients, and usage for L'Oréal products. For corporate or legal matters, please consult L'Oréal's official channels."
+    );
+    return;
+  }
 
   // Show a temporary assistant placeholder
   const loading = document.createElement("div");
