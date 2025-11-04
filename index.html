@@ -23,6 +23,18 @@
         <h1 class="site-title">Smart Product Advisor</h1>
       </header>
 
+      <!-- Diagnostics / Testing tools -->
+      <div class="diagnostics">
+        <label
+          ><input type="checkbox" id="disableDetector" /> Disable off-topic
+          detector</label
+        >
+        <div id="diagStatus" class="diag-status" aria-live="polite">
+          Status: idle
+        </div>
+        <pre id="diagRaw" class="diag-raw"></pre>
+      </div>
+
       <!------- Chat Area ------->
       <main>
         <section class="chatbox">

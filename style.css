@@ -57,6 +57,28 @@ body {
   height: auto;
 }
 
+/* Diagnostics panel */
+.diagnostics {
+  margin: 10px 0 0;
+  font-size: 13px;
+  color: var(--color-muted);
+  text-align: center;
+}
+.diag-status {
+  margin-top: 6px;
+}
+.diag-raw {
+  margin: 8px auto 0;
+  max-width: 100%;
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 8px;
+  font-size: 12px;
+  height: 100px;
+  overflow: auto;
+  white-space: pre-wrap;
+}
+
 /* -------- chat area -------- */
 .chatbox {
   margin: 40px 0;

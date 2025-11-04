@@ -9,6 +9,25 @@ chatWindow.innerHTML = `<div class="assistant-msg">👋 Hello! How can I help yo
 // Cloudflare Worker URL that proxies OpenAI requests
 const WORKER_URL = "https://loreal-chatbot.lejenna737.workers.dev/";
 
+// Diagnostics elements (optional)
+const disableDetectorEl = document.getElementById("disableDetector");
+const diagStatusEl = document.getElementById("diagStatus");
+const diagRawEl = document.getElementById("diagRaw");
+
+function setDiag(status, raw) {
+  try {
+    if (diagStatusEl) diagStatusEl.textContent = `Status: ${status}`;
+    if (diagRawEl)
+      diagRawEl.textContent = raw
+        ? typeof raw === "string"
+          ? raw
+          : JSON.stringify(raw, null, 2)
+        : "";
+  } catch (e) {
+    console.warn("Diagnostics update failed", e);
+  }
+}
+
 function appendMessage(role, text) {
   const el = document.createElement("div");
   el.className = role === "user" ? "user-msg" : "assistant-msg";
@@ -49,7 +68,7 @@ chatForm.addEventListener("submit", async (e) => {
     "email",
     "headquarters",
     "founder",
-    "careers",Ca
+    "careers",
     "jobs",
     "politics",
     "religion",
@@ -61,11 +80,15 @@ chatForm.addEventListener("submit", async (e) => {
   const lower = text.toLowerCase();
   const looksOffTopic = offTopicKeywords.some((k) => lower.includes(k));
 
-  if (brandMention && looksOffTopic) {
+  // allow disabling the detector via the diagnostics checkbox
+  const detectorDisabled = disableDetectorEl?.checked === true;
+
+  if (!detectorDisabled && brandMention && looksOffTopic) {
     appendMessage(
       "assistant",
       "Please stay on topic — I can help with product recommendations, routines, ingredients, and usage for L'Oréal products. For corporate or legal matters, please consult L'Oréal's official channels."
     );
+    setDiag("short-circuited - off-topic detected", null);
     return;
   }
 
@@ -82,11 +105,16 @@ chatForm.addEventListener("submit", async (e) => {
   try {
     const body = { messages: [{ role: "user", content: text }] };
 
+    setDiag("sending request", { url: WORKER_URL, body });
+    console.log("Sending request to worker", WORKER_URL, body);
+
     const resp = await fetch(WORKER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
+
+    setDiag(`response status ${resp.status}`, null);
 
     if (!resp.ok) {
       const txt = await resp.text();
@@ -94,6 +122,8 @@ chatForm.addEventListener("submit", async (e) => {
     }
 
     const data = await resp.json();
+    console.log("Worker response JSON:", data);
+    setDiag("received JSON", data);
 
     // Cloudflare worker (proxy) may return several shapes (string, object, arrays).
     // Normalize into a human-friendly string to avoid showing [object Object].
